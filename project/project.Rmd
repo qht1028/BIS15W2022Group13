@@ -1,0 +1,67 @@
+---
+title: "15L group project"
+author: "Hongtao Qian"
+date: "2022/2/15"
+output:
+  html_document: 
+    keep_md: yes
+    theme: spacelab
+---
+
+## Seed Variability
+The data set used here is on [New Phytologist](https://nph.onlinelibrary.wiley.com/doi/10.1111/nph.16617). Pearse, I.S., LaMontagne, J.M., Lordon, M., Hipp, A.L. and Koenig, W.D. (2020), Biogeography and phylogeny of masting: do global patterns fit functional hypotheses?. New Phytol, 227: 1557-1567. 
+```{r}
+library(tidyverse)
+library(skimr)
+library(ggplot2)
+library(here)
+library(janitor)
+```
+
+1. Data load from the original CSV file. 
+```{r}
+seed <- read.csv(here("project", "data", "interannual_variability.csv"))%>%
+  clean_names()%>%
+  select(!contains("sd_"))%>%
+  select(!contains("acf"))%>%
+  select(!contains("mid"))%>%
+  select(!contains("long"))
+skim(seed)
+```
+2. Data tidy up to change the information of latitude to different types of regions. 
+```{r}
+seed <- seed%>%
+  mutate(region=case_when(-23.5<=latitude & latitude<=23.5~"Tropical", 
+                          23.5<latitude | -23.5>latitude~"Temperate", 
+                          ))
+head(seed, n=5)
+```
+
+
+3. Take the glimpse of the relationship between variability of seed crops (cv) and latitude or variability of annual precipitation (cv_precip_annual). 
+```{r}
+seed %>%
+  ggplot(aes(x=latitude, y=cv, color=region))+
+  geom_point()
+```
+
+```{r}
+seed %>%
+  ggplot(aes(x=cv_precip_annual, y=cv, color=region))+
+  geom_point()
+```
+#### This comparison does not indicate a strong relationship. 
+
+4. Make a comparision between variability of seed crops (cv) and variability of seasonal precipitation (cv_precip_spring & cv_precip_summer). 
+```{r}
+seed %>%
+  select(cv, cv_precip_spring, cv_precip_summer, pollination_type, seed_dispersal_type)%>%
+  rename(spring = cv_precip_spring, summer=cv_precip_summer)%>%
+  pivot_longer(cols = c("spring", "summer"),
+                 values_to = "cv_precip", 
+               names_to = "season")%>%
+  ggplot(aes(x=cv_precip, y=cv, color=season))+
+  geom_point(alpha=.2)+
+  geom_smooth(se=F)
+```
+
