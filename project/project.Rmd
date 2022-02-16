@@ -42,9 +42,9 @@ head(seed, n=5)
 ```{r}
 seed %>%
   ggplot(aes(x=latitude, y=cv))+
-  xlim(0, 65)+
   geom_point()+
-  geom_smooth(se=F)
+  geom_smooth(se=F)+
+  facet_wrap(~hemisphere, scales = "free")
 ```
 
 ```{r}
@@ -74,7 +74,7 @@ seed %>%
   group_by(pollination_type)%>%
   ggplot(aes(x=pollination_type, y=cv, fill=pollination_type))+
   geom_boxplot()+
-  facet_grid(seed_dispersal_type~lifeform)
+  facet_wrap(~seed_dispersal_type)
 ```
 
 6. Intergenus comparison to examine whether there is a relationship between variability of seed crops (cv) and genus. Just choose three genus with the most series. 
@@ -86,13 +86,13 @@ seed%>%
 ```
 ```{r}
 seed%>%
-  filter(genus == "QUERCUS" | genus == "PINUS" | genus == "CHIONOCHLOA")%>%
+  filter(genus == "QUERCUS" | genus == "PINUS" | genus == "ABIES")%>%
   ggplot(aes(x=genus, y=cv, fill=genus))+
   geom_boxplot()
 ```
 ```{r}
 seed%>%
-  filter(genus == "QUERCUS" | genus == "PINUS" | genus == "CHIONOCHLOA")%>%
+  filter(genus == "QUERCUS" | genus == "PINUS" | genus == "ABIES")%>%
   ggplot(aes(x=latitude, fill=genus))+
   geom_density(alpha=.2)
 ```
