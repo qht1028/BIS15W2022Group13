@@ -41,21 +41,24 @@ head(seed, n=5)
 3. Take the glimpse of the relationship between variability of seed crops (cv) and latitude or variability of annual precipitation (cv_precip_annual). 
 ```{r}
 seed %>%
-  ggplot(aes(x=latitude, y=cv, color=region))+
-  geom_point()
+  ggplot(aes(x=latitude, y=cv))+
+  xlim(0, 65)+
+  geom_point()+
+  geom_smooth(se=F)
 ```
 
 ```{r}
 seed %>%
-  ggplot(aes(x=cv_precip_annual, y=cv, color=region))+
-  geom_point()
+  ggplot(aes(x=cv_precip_annual, y=cv))+
+  geom_point()+
+  geom_smooth(se=F)
 ```
 #### This comparison does not indicate a strong relationship. 
 
 4. Make a comparision between variability of seed crops (cv) and variability of seasonal precipitation (cv_precip_spring & cv_precip_summer). 
 ```{r}
 seed %>%
-  select(cv, cv_precip_spring, cv_precip_summer, pollination_type, seed_dispersal_type)%>%
+  select(cv, cv_precip_spring, cv_precip_summer, region, pollination_type, seed_dispersal_type)%>%
   rename(spring = cv_precip_spring, summer=cv_precip_summer)%>%
   pivot_longer(cols = c("spring", "summer"),
                  values_to = "cv_precip", 
@@ -64,4 +67,34 @@ seed %>%
   geom_point(alpha=.2)+
   geom_smooth(se=F)
 ```
+
+5. It's time to determine the relationship between variability of seed crops (cv) and some characteristics among plant species. 
+```{r}
+seed %>%
+  group_by(pollination_type)%>%
+  ggplot(aes(x=pollination_type, y=cv, fill=pollination_type))+
+  geom_boxplot()+
+  facet_grid(seed_dispersal_type~lifeform)
+```
+
+6. Intergenus comparison to examine whether there is a relationship between variability of seed crops (cv) and genus. Just choose three genus with the most series. 
+```{r}
+seed%>%
+  group_by(genus)%>%
+  summarise(type=n_distinct(species))%>%
+  arrange(desc(type))
+```
+```{r}
+seed%>%
+  filter(genus == "QUERCUS" | genus == "PINUS" | genus == "CHIONOCHLOA")%>%
+  ggplot(aes(x=genus, y=cv, fill=genus))+
+  geom_boxplot()
+```
+```{r}
+seed%>%
+  filter(genus == "QUERCUS" | genus == "PINUS" | genus == "CHIONOCHLOA")%>%
+  ggplot(aes(x=latitude, fill=genus))+
+  geom_density(alpha=.2)
+```
+
 
