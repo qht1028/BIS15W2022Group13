@@ -24,8 +24,7 @@ seed <- read.csv(here("project", "data", "interannual_variability.csv"))%>%
   clean_names()%>%
   select(!contains("sd_"))%>%
   select(!contains("acf"))%>%
-  select(!contains("mid"))%>%
-  select(!contains("long"))
+  select(!contains("mid"))
 skim(seed)
 ```
 2. Data tidy up to change the information of latitude to different types of regions. 
@@ -40,7 +39,13 @@ head(seed, n=5)
 
 3. Take the glimpse of the relationship between variability of seed crops (cv) and latitude or variability of annual precipitation (cv_precip_annual). 
 ```{r}
-seed %>%
+lat <- c(-46.3, 65.9)
+long <- c(-148.1, 176.5)
+bounding <- make_bbox(long, lat, f = 0.05)
+seed_map <- get_map(bounding, style = "watercolor", source = "stamen")
+ggmap(seed_map)+
+  geom_point(data=seed, aes(longitude, latitude))
+seed%>%
   ggplot(aes(x=latitude, y=cv))+
   geom_point()+
   geom_smooth(se=F)+
@@ -96,5 +101,6 @@ seed%>%
   ggplot(aes(x=latitude, fill=genus))+
   geom_density(alpha=.2)
 ```
+
 
 
