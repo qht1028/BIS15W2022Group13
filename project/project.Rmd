@@ -16,6 +16,7 @@ library(skimr)
 library(ggplot2)
 library(here)
 library(janitor)
+library(ggmap)
 ```
 
 1. Data load from the original CSV file. 
@@ -44,7 +45,7 @@ long <- c(-148.1, 176.5)
 bounding <- make_bbox(long, lat, f = 0.05)
 seed_map <- get_map(bounding, style = "watercolor", source = "stamen")
 ggmap(seed_map)+
-  geom_point(data=seed, aes(longitude, latitude))
+  geom_point(data=seed, aes(longitude, latitude, color = cv))
 seed%>%
   ggplot(aes(x=latitude, y=cv))+
   geom_point()+
